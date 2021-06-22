@@ -25,3 +25,5 @@ yarn-error.log*
 venv
 app.db
 __pycache__
+.vscode
+app/venv
