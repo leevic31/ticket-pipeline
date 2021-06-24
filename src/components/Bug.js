@@ -2,8 +2,57 @@ import React from 'react';
 import Button from 'react-bootstrap/Button'
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
+import cellEditFactory, { Type } from 'react-bootstrap-table2-editor';
 
-export default function Bug({rows, setRow}) {
+export default function Bug({rows, setRow, setBug}) {
+
+    const priorityFormatter = (cell) => {
+        if (cell === "low") {
+            return (
+                <p style={{ color: "#1CBF02" }}>
+                {cell}
+                </p>
+            )
+        }
+        if (cell === "medium") {
+            return (
+                <p style={{ color: "yellow" }}>
+                {cell}
+                </p>
+            )
+        }
+        if (cell === "high") {
+            return (
+                <p style={{ color: "red" }}>
+                {cell}
+                </p>
+            )
+        }
+    }
+
+    const statusFormatter = (cell) => {
+        if (cell === "complete") {
+            return (
+                <p style={{ color: "#1CBF02" }}>
+                {cell}
+                </p>
+            )
+        }
+        if (cell === "inprogress") {
+            return (
+                <p style={{ color: "yellow" }}>
+                {cell}
+                </p>
+            )
+        }
+        if (cell === "incomplete") {
+            return (
+                <p style={{ color: "red" }}>
+                {cell}
+                </p>
+            )
+        }
+    }
 
     const data = rows.map(row => ({
         id: row.id,
@@ -28,12 +77,40 @@ export default function Bug({rows, setRow}) {
     }, {
         dataField: 'priority',
         text: "Priority",
+        formatter: priorityFormatter,
+        editor: {
+            type: Type.SELECT,
+            options: [{
+              value: 'low',
+              label: 'low',
+            }, {
+              value: 'medium',
+              label: 'edium'
+            }, {
+              value: 'high',
+              label: 'high'
+            }]
+          },        
         headerStyle: (colum, colIndex) => {
             return { width: '100px',};
           }
     }, {
         dataField: 'status',
         text: "Status",
+        formatter: statusFormatter,
+        editor: {
+            type: Type.SELECT,
+            options: [{
+              value: 'incomplete',
+              label: 'incomplete',
+            }, {
+              value: 'in progress',
+              label: 'in progress'
+            }, {
+              value: 'complete',
+              label: 'complete'
+            }]
+          },  
         headerStyle: (colum, colIndex) => {
             return { width: '100px',};
           }
@@ -75,7 +152,7 @@ export default function Bug({rows, setRow}) {
             });
         }
         fetch('/bugs').then(res => res.json()).then(data => {
-            setRow(data);
+            setBug(data);
         });
     }
 
@@ -85,10 +162,11 @@ export default function Bug({rows, setRow}) {
             <Button className="Delete-bug-button" variant="outline-danger" onClick={handleDelete}>Delete</Button>
             <hr></hr>
             <BootstrapTable condensed hover striped keyField='id' 
-                data={ data } 
+                data={ data }
                 columns={ columns } 
                 bordered={ false }
-                selectRow={ selectRow }            
+                selectRow={ selectRow }
+                cellEdit={ cellEditFactory({ mode: 'click', blurToSave: true }) }       
             />
         </div>
     );

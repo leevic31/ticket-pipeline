@@ -18,40 +18,37 @@ function App() {
   };
 
   const [rows, setRow] = useState([]);
-  const [addBug, setAddBug] = useState(initialValues)
+  const [bugs, setBug] = useState(initialValues)
 
   useEffect(() => {
     fetch('/bugs').then(res => res.json()).then(data => {
       setRow(data);
     });
-  }, []);
+  }, [bugs]);
 
   const handleFormChange = (inputValue) => {
-    setAddBug(inputValue)
+    setBug(inputValue)
   }
 
   const handleFormSubmit = () => {
     fetch('/add-bug', {
       method: 'POST',
       body: JSON.stringify({
-        content:addBug,
+        content:bugs,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
     }).then(response => response.json())
+      .then(data => setBug(data))
        . then(message => console.log(message))
-
-    fetch('/bugs').then(res => res.json()).then(data => {
-      setRow(data);
-    });
   }
 
   return (
     <div className="App-header">
     <Router>
     <Route path='/add-bug'>
-      <AddBug userInput={addBug} onFormChange={handleFormChange} onFormSubmit={handleFormSubmit} />
+      <AddBug userInput={bugs} onFormChange={handleFormChange} onFormSubmit={handleFormSubmit} />
     </Route>
     <Route render={({ location, history }) => (
         <React.Fragment>
@@ -85,7 +82,8 @@ function App() {
             </SideNav>
             <main>
                 <Route path="/" exact component={props => <Home />} />
-                <Route path="/bugs" component={props => <Bug rows={rows} setRow={setRow}/>} />
+                <Route path="/bugs" component={props => <Bug rows={rows} setRow={setRow} setBug={setBug}/>} />
+
             </main>
         </React.Fragment>
     )}
